@@ -3,7 +3,7 @@ type: library
 name: zurborg/wrap-json
 
 description: Wrapper for common JSON handling
-homepage: https://github.com/zurborg/libjson-php
+homepage: https://github.com/zurborg/libwrap-json-php
 license: ISC
 keywords:
   - json
