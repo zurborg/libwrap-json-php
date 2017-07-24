@@ -27,7 +27,7 @@ Encode data to JSON
 
 This is a wrapper around `json_encode()` with following options enabled by default:
 + `JSON_UNESCAPED_UNICODE` - All unicode characters are printed as they are
-+ `JSON_PRESERVE_ZERO_FRACTION` - float numbers are printed as float numbers, even when their fractional part is zero
++ `JSON_PRESERVE_ZERO_FRACTION` - float numbers are printed as float numbers, even when their fractional part is zero (only available if php version >= 5.6.6)
 + `JSON_UNESCAPED_SLASHES` - slashes in strings will not be escaped
 
 If there is any error, an execption will be thrown, so you don't have to check the return value any longer.

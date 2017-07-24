@@ -22,7 +22,7 @@ class JSON
      *
      * This is a wrapper around `json_encode()` with following options enabled by default:
      * + `JSON_UNESCAPED_UNICODE` - All unicode characters are printed as they are
-     * + `JSON_PRESERVE_ZERO_FRACTION` - float numbers are printed as float numbers, even when their fractional part is zero
+     * + `JSON_PRESERVE_ZERO_FRACTION` - float numbers are printed as float numbers, even when their fractional part is zero (only available if php version >= 5.6.6)
      * + `JSON_UNESCAPED_SLASHES` - slashes in strings will not be escaped
      *
      * If there is any error, an execption will be thrown, so you don't have to check the return value any longer.
@@ -34,7 +34,12 @@ class JSON
      */
     public static function encode($data, $options = 0)
     {
-        $json = \json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRESERVE_ZERO_FRACTION | JSON_UNESCAPED_SLASHES | $options);
+        $options |= JSON_UNESCAPED_UNICODE;
+        $options |= JSON_UNESCAPED_SLASHES;
+        if (version_compare(PHP_VERSION, '5.6.6', '>=')) {
+            $options |= JSON_PRESERVE_ZERO_FRACTION;
+        }
+        $json = \json_encode($data, $options);
         if (\json_last_error() !== JSON_ERROR_NONE) {
             throw new EncodeException(\json_last_error_msg(), \json_last_error());
         }
