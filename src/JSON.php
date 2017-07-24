@@ -34,12 +34,7 @@ class JSON
      */
     public static function encode($data, $options = 0)
     {
-        $options |= JSON_UNESCAPED_UNICODE;
-        $options |= JSON_UNESCAPED_SLASHES;
-        if (version_compare(PHP_VERSION, '5.6.6', '>=')) {
-            $options |= JSON_PRESERVE_ZERO_FRACTION;
-        }
-        $json = \json_encode($data, $options);
+        $json = \json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRESERVE_ZERO_FRACTION | JSON_UNESCAPED_SLASHES | $options);
         if (\json_last_error() !== JSON_ERROR_NONE) {
             throw new EncodeException(\json_last_error_msg(), \json_last_error());
         }
