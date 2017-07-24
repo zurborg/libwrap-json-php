@@ -32,7 +32,7 @@ class JSON
      * @throw \Wrap\JSON\EncodeException
      * @return string JavaScript Object Notation
      */
-    public static function encode($data, int $options = 0)
+    public static function encode($data, $options = 0)
     {
         $json = \json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRESERVE_ZERO_FRACTION | JSON_UNESCAPED_SLASHES | $options);
         if (\json_last_error() !== JSON_ERROR_NONE) {
@@ -51,7 +51,7 @@ class JSON
      * @throw \Wrap\JSON\EncodeException
      * @return string (pretty) JavaScript Object Notation
      */
-    public static function encodePretty($data, int $options = 0)
+    public static function encodePretty($data, $options = 0)
     {
         return self::encode($data, JSON_PRETTY_PRINT | $options);
     }
@@ -59,7 +59,7 @@ class JSON
     /**
      * @internal
      */
-    protected static function decode(string $json, bool $assoc, int $depth, int $options)
+    protected static function decode($json, $assoc, $depth, $options)
     {
         $data = \json_decode($json, $assoc, $depth, $options);
         if (\json_last_error() !== JSON_ERROR_NONE) {
@@ -81,7 +81,7 @@ class JSON
      * @throw \Wrap\JSON\DecodeException
      * @return array|mixed Decoded data
      */
-    public static function decodeArray(string $json, int $depth = 512, int $options = 0)
+    public static function decodeArray($json, $depth = 512, $options = 0)
     {
         return self::decode($json, true, $depth, $options);
     }
@@ -99,7 +99,7 @@ class JSON
      * @throw \Wrap\JSON\DecodeException
      * @return stdClass|mixed Decoded data
      */
-    public static function decodeObject(string $json, int $depth = 512, int $options = 0)
+    public static function decodeObject($json, $depth = 512, $options = 0)
     {
         return self::decode($json, false, $depth, $options);
     }
