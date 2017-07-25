@@ -12,7 +12,6 @@ class WrapJsonTest extends PHPUnit_Framework_TestCase
         $this->assertSame(JSON::encode(123.456), '123.456');
         $this->assertSame(JSON::encode(-0), '0');
         $this->assertSame(JSON::encode(-123), '-123');
-        $this->assertSame(JSON::encode(-0.0), '0.0');
         $this->assertSame(JSON::encode(-123.456), '-123.456');
         $this->assertSame(JSON::encode('foobar'), '"foobar"');
         $this->assertSame(JSON::encode('foo/bar'), '"foo/bar"');
@@ -41,7 +40,6 @@ class WrapJsonTest extends PHPUnit_Framework_TestCase
         $this->assertSame(JSON::encodePretty(123.456), '123.456');
         $this->assertSame(JSON::encodePretty(-0), '0');
         $this->assertSame(JSON::encodePretty(-123), '-123');
-        $this->assertSame(JSON::encodePretty(-0.0), '0.0');
         $this->assertSame(JSON::encodePretty(-123.456), '-123.456');
         $this->assertSame(JSON::encodePretty('foobar'), '"foobar"');
         $this->assertSame(JSON::encodePretty('foo/bar'), '"foo/bar"');
@@ -61,7 +59,6 @@ class WrapJsonTest extends PHPUnit_Framework_TestCase
         $this->assertSame(123.456, JSON::decodeArray('123.456'));
         $this->assertSame(-0, JSON::decodeArray('0'));
         $this->assertSame(-123, JSON::decodeArray('-123'));
-        $this->assertSame(-0.0, JSON::decodeArray('0.0'));
         $this->assertSame(-123.456, JSON::decodeArray('-123.456'));
         $this->assertSame('foobar', JSON::decodeArray('"foobar"'));
         $this->assertSame('foo/bar', JSON::decodeArray('"foo/bar"'));
@@ -81,7 +78,6 @@ class WrapJsonTest extends PHPUnit_Framework_TestCase
         $this->assertSame(123.456, JSON::decodeObject('123.456'));
         $this->assertSame(-0, JSON::decodeObject('0'));
         $this->assertSame(-123, JSON::decodeObject('-123'));
-        $this->assertSame(-0.0, JSON::decodeObject('0.0'));
         $this->assertSame(-123.456, JSON::decodeObject('-123.456'));
         $this->assertSame('foobar', JSON::decodeObject('"foobar"'));
         $this->assertSame('foo/bar', JSON::decodeObject('"foo/bar"'));
@@ -93,6 +89,26 @@ class WrapJsonTest extends PHPUnit_Framework_TestCase
         $obj = new stdClass((object)[]);
         $obj->foo = 'bar';
         $this->assertEquals($obj, JSON::decodeObject('{"foo":"bar"}'));
+    }
+
+    public function testPHP5()
+    {
+        if (version_compare(PHP_VERSION, '7.0.0') < 0) {
+            $this->assertSame(JSON::encode(0.0), '0.0');
+            $this->assertSame(JSON::encodePretty(0.0), '0.0');
+            $this->assertSame(0.0, JSON::decodeObject('0.0'));
+            $this->assertSame(0.0, JSON::decodeArray('0.0'));
+        }
+    }
+
+    public function testPHP7()
+    {
+        if (version_compare(PHP_VERSION, '7.0.0') >= 0) {
+            $this->assertSame(JSON::encode(-0.0), '-0.0');
+            $this->assertSame(JSON::encodePretty(-0.0), '-0.0');
+            $this->assertSame(-0.0, JSON::decodeObject('-0.0'));
+            $this->assertSame(-0.0, JSON::decodeArray('-0.0'));
+        }
     }
 
     /**
