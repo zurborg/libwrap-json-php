@@ -2,7 +2,8 @@
 
 namespace Wrap\JSON;
 
-class EncodeException extends \RuntimeException
-{
+use RuntimeException;
 
+class EncodeException extends RuntimeException
+{
 }

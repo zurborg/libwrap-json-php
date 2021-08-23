@@ -1,8 +1,16 @@
 <?php
 
-use Wrap\JSON;
+declare(strict_types=1);
 
-class WrapJsonTest extends PHPUnit_Framework_TestCase
+namespace Test;
+
+use PHPUnit\Framework\TestCase;
+use stdClass;
+use Wrap\JSON;
+use Wrap\JSON\DecodeException;
+use Wrap\JSON\EncodeException;
+
+class WrapJsonTest extends TestCase
 {
     public function testEncode()
     {
@@ -18,18 +26,16 @@ class WrapJsonTest extends PHPUnit_Framework_TestCase
         $this->assertSame(JSON::encode('foo/bar'), '"foo/bar"');
         $this->assertSame(JSON::encode('æßðđŋħĸł'), '"æßðđŋħĸł"');
         $this->assertSame(JSON::encode(null), 'null');
-        $this->assertSame(JSON::encode((array)[]), '[]');
-        $this->assertSame(JSON::encode((object)[]), '{}');
-        $this->assertSame(JSON::encode([1,2,3]), '[1,2,3]');
-        $this->assertSame(JSON::encode(['foo'=>'bar']), '{"foo":"bar"}');
+        $this->assertSame(JSON::encode((array) []), '[]');
+        $this->assertSame(JSON::encode((object) []), '{}');
+        $this->assertSame(JSON::encode([1, 2, 3]), '[1,2,3]');
+        $this->assertSame(JSON::encode(['foo' => 'bar']), '{"foo":"bar"}');
     }
 
-    /**
-     * @expectedException Wrap\JSON\EncodeException
-     * @expectedExceptionMessage Inf and NaN cannot be JSON encoded
-     */
     public function testEncodeException()
     {
+        $this->expectExceptionMessage("Inf and NaN cannot be JSON encoded");
+        $this->expectException(EncodeException::class);
         JSON::encode(log(0));
     }
 
@@ -47,10 +53,10 @@ class WrapJsonTest extends PHPUnit_Framework_TestCase
         $this->assertSame(JSON::encodePretty('foo/bar'), '"foo/bar"');
         $this->assertSame(JSON::encodePretty('æßðđŋħĸł'), '"æßðđŋħĸł"');
         $this->assertSame(JSON::encodePretty(null), 'null');
-        $this->assertSame(JSON::encodePretty((array)[]), '[]');
-        $this->assertSame(JSON::encodePretty((object)[]), '{}');
-        $this->assertSame(JSON::encodePretty([1,2,3]), "[\n    1,\n    2,\n    3\n]");
-        $this->assertSame(JSON::encodePretty(['foo'=>'bar']), "{\n    \"foo\": \"bar\"\n}");
+        $this->assertSame(JSON::encodePretty((array) []), '[]');
+        $this->assertSame(JSON::encodePretty((object) []), '{}');
+        $this->assertSame(JSON::encodePretty([1, 2, 3]), "[\n    1,\n    2,\n    3\n]");
+        $this->assertSame(JSON::encodePretty(['foo' => 'bar']), "{\n    \"foo\": \"bar\"\n}");
     }
 
     public function testDecodeArray()
@@ -69,8 +75,8 @@ class WrapJsonTest extends PHPUnit_Framework_TestCase
         $this->assertSame(null, JSON::decodeArray('null'));
         $this->assertSame([], JSON::decodeArray('[]'));
         $this->assertSame([], JSON::decodeArray('{}'));
-        $this->assertSame([1,2,3], JSON::decodeArray('[1,2,3]'));
-        $this->assertSame(['foo'=>'bar'], JSON::decodeArray('{"foo":"bar"}'));
+        $this->assertSame([1, 2, 3], JSON::decodeArray('[1,2,3]'));
+        $this->assertSame(['foo' => 'bar'], JSON::decodeArray('{"foo":"bar"}'));
     }
 
     public function testDecodeObject()
@@ -88,19 +94,17 @@ class WrapJsonTest extends PHPUnit_Framework_TestCase
         $this->assertSame('æßðđŋħĸł', JSON::decodeObject('"æßðđŋħĸł"'));
         $this->assertSame(null, JSON::decodeObject('null'));
         $this->assertSame([], JSON::decodeObject('[]'));
-        $this->assertEquals(new stdClass((object)[]), JSON::decodeObject('{}'));
-        $this->assertEquals([1,2,3], JSON::decodeObject('[1,2,3]'));
-        $obj = new stdClass((object)[]);
+        $this->assertEquals(new stdClass((object) []), JSON::decodeObject('{}'));
+        $this->assertEquals([1, 2, 3], JSON::decodeObject('[1,2,3]'));
+        $obj = new stdClass((object) []);
         $obj->foo = 'bar';
         $this->assertEquals($obj, JSON::decodeObject('{"foo":"bar"}'));
     }
 
-    /**
-     * @expectedException Wrap\JSON\DecodeException
-     * @expectedExceptionMessage Syntax error
-     */
     public function testDecodeException()
     {
-        JSON::decodeArray('');
+        $this->expectException(DecodeException::class);
+        $this->expectExceptionMessage("Syntax error");
+        JSON::decodeArray('{["');
     }
 }

@@ -1,54 +1,39 @@
 php=php
 perl=perl
-composer=$(php) composer.phar
+composer=composer
 phpcs=$(php) vendor/bin/phpcs
 phpunit=$(php) vendor/bin/phpunit
-phpdoc=$(php) vendor/bin/phpdoc
-phpdocmd=$(php) vendor/bin/phpdocmd
 yaml2json=$(perl) -MJSON -MYAML -eprint -e'encode_json(YAML::Load(join""=><>))'
-getversion=$(perl) -MYAML -eprint -e'YAML::Load(join""=><>)->{version}'
-V=`$(getversion) < composer.yaml`
 
-all: | vendor test docs
-
-info:
-	@echo $(php)
-	@$(php) -v
-	@echo $(perl)
-	@$(perl) -v
-
-docs:
-	if [ -d $@ ]; then git rm -f $@/*.md; else mkdir $@; fi
-	$(phpdoc) -d src/ -t $@ --template=xml --visibility=public >phpdoc.out
-	$(phpdocmd) docs/structure.xml docs/ > phpdocmd.out
-	git add docs/*.md
-	git clean -xdf docs
+all: | vendor test
 
 clean:
-	git clean -xdf -e composer.phar -e vendor
+	@echo " --> $@"
+	git clean -xdf -e vendor
 
 vendor: composer.json
+	@echo " --> $@"
 	$(composer) --prefer-dist install >composer.out
+	rm composer.lock
 
 composer.json: composer.yaml
-	$(yaml2json) < $< > $@~
-	mv $@~ $@
-	-rm composer.lock
-	git add $@
+	@echo " --> $@"
+	$(yaml2json) < $? > $@
+	git add -v -- $@
 
 test: lint
+	@echo " --> $@"
 	$(phpcs) --warning-severity=0 --standard=PSR2 src
-	$(phpunit) --verbose tests/
+	$(phpunit) --color=always tests
+
+.lint/%.php: %.php
+	@echo " --> $@"
+	mkdir -p -- `dirname -- $@`
+	$(php) -l $?
+	touch $@
 
 lint:
-	for file in `find src tests -name '*.php' | sort`; do $(php) -l $$file || exit 1; done
+	@echo " --> $@"
+	find src tests -name '*.php' -print0 | sed -zr 's|^|.lint/|' | sort -zuV | xargs -0 -r -- $(MAKE) $(MFLAGS) --
 
-archive: | clean composer.json
-	$(composer) archive
-
-release:
-	git push --all
-	git tag -m "Release version $V" -s v$V
-	git push --tags
-
-.PHONY: all info docs clean test archive release
+.PHONY: all clean vendor test lint

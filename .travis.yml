@@ -9,5 +9,4 @@ script:
   - vendor/bin/phpunit tests
 
 php:
-  - 7.0
-  - 7.1
+  - 7.4
